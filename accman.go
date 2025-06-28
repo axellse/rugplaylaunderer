@@ -4,7 +4,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -15,7 +14,6 @@ var activePromo string
 
 func loadAccounts() {
 	rawAccs := os.Getenv("ACCOUNTS")
-	fmt.Println(string([]byte(rawAccs)))
 	var accounts []account
 	unmarshalerr := json.Unmarshal([]byte(rawAccs), &accounts)
 	if unmarshalerr != nil {
