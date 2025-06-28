@@ -46,15 +46,16 @@ func makeTrade(action string, coin string, amount float64, token string) error {
 }
 
 func main() {
-	fmt.Println("welcome to the program!")
-	fmt.Println("note: this program is used to generate income and launder money on the platform rugplay, created by the youtuber facedev. it's an online playground for investments that does not involve real money at all, everything is made up. using this program is against the rugplay TOS but of course not illegal.")
+	fmt.Println("welcome to the program! 💸💸💸")
+	fmt.Println("note: this program is used to generate income and launder money on the platform rugplay, created by the youtuber facedev. it's an online playground for investments that does not involve real money at all, everything is made up.")
+	fmt.Println("----------------------------------------")
 	fmt.Print("loading accounts... ")
 	loadAccounts()
 	fmt.Println("done!")
-	fmt.Print("filling accounts... 🤑🤑🤑 ")
+	fmt.Print("filling accounts... ")
 	earned := fillAccounts()
 	go startFillingAccounts()
-	fmt.Println("done! (earned " + strconv.FormatFloat(earned, 'g', -1, 64) + " across all accounts)")
-	
+	fmt.Println("done! (earned " + strconv.FormatFloat(earned, 'g', -1, 64) + " across all accounts 🤑🤑🤑)")
+
 
 }
