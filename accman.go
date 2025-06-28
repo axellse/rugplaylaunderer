@@ -4,67 +4,68 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
+	"fmt"
+	"log"
 	"os"
-	"strings"
 	"time"
 )
 
-var managedAccounts []*account
+var managedAccounts *[]account
 var activePromo string
 
 func loadAccounts() {
-  rawAccs := os.Getenv("ACCOUNTS")
-  var accounts []*account
-  unmarshalerr := json.Unmarshal([]byte(rawAccs), accounts)
-  if unmarshalerr != nil {
-    panic("cant unmarshal accounts")
-  }
-  managedAccounts = accounts
+	rawAccs := os.Getenv("ACCOUNTS")
+	fmt.Println(string([]byte(rawAccs)))
+	var accounts []account
+	unmarshalerr := json.Unmarshal([]byte(rawAccs), &accounts)
+	if unmarshalerr != nil {
+		log.Fatal("failed unmarshaling acccounts: ", unmarshalerr)
+	}
+	managedAccounts = &accounts
 }
 
-func fillAccounts() { //🤑🤑🤑
-	for _, acc := range managedAccounts {
-		claimDailyReward(acc.Token)
-    if acc.latestClaimedPromo != activePromo {
-      claimCurrentPromo(acc.Token)
-      acc.latestClaimedPromo = activePromo
-    }
-		
+func fillAccounts() float64 { //🤑🤑🤑
+	var moneyEarned float64
+	newAccs := []account{}
+	for _, acc := range *managedAccounts {
+		moneyEarned += claimDailyReward(acc.Token)
+		if acc.latestClaimedPromo != activePromo {
+			moneyEarned += claimCurrentPromo(acc.Token)
+			acc.latestClaimedPromo = activePromo
+		}
+		newAccs = append(newAccs, acc)
 	}
+	managedAccounts = &newAccs
+
+	return moneyEarned
 }
 
 func startFillingAccounts() {
-  for {
-    time.Sleep(3 * time.Hour)
-    fillAccounts()
-  }
+	for {
+		time.Sleep(3 * time.Hour)
+		fillAccounts()
+	}
 }
 
-func claimDailyReward(token string) {
+func claimDailyReward(token string) float64 {
 	//daily reward
-	req, err := http.NewRequest("POST", "https://rugplay.com/api/rewards/claim", nil)
-	req.AddCookie(&http.Cookie{
-		Name:  "__Secure-better-auth.session_token",
-		Value: token,
-	})
+	_, err := makeRequest("POST", "https://rugplay.com/api/rewards/claim", nil, token)
+	//TODO: get earned money
 
 	if err != nil {
-		return
+		return 0
 	}
-	http.DefaultClient.Do(req)
+
+	return 0
 }
 
-func claimCurrentPromo(token string) {
-	body := strings.NewReader("{code: \"mustard\"}")
-	promoreq, rcerr := http.NewRequest("POST", "https://rugplay.com/api/promo/verify", body)
-	promoreq.AddCookie(&http.Cookie{
-		Name:  "__Secure-better-auth.session_token",
-		Value: token,
-	})
-	if rcerr != nil {
-		return
+func claimCurrentPromo(token string) float64 {
+	_, err := makeRequest("POST", "https://rugplay.com/api/promo/verify", "{code: \"mustard\"}", token)
+	//TODO: get earned money
+
+	if err != nil {
+		return 0
 	}
 
-	http.DefaultClient.Do(promoreq)
+	return 0
 }

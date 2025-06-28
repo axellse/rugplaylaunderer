@@ -1,3 +1,3 @@
-module main
+module axell.me/rugplaylaunder
 
-go 1.21
+go 1.24.4

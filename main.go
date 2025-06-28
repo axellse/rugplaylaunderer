@@ -1,4 +1,5 @@
 package main
+
 //entry point
 
 import (
@@ -12,16 +13,16 @@ import (
 )
 
 func makeTrade(action string, coin string, amount float64, token string) error {
-	body := strings.NewReader("{\"type\":\""+action+"\",\"amount\":"+strconv.FormatFloat(amount, 'g', -1, 64)+"}") //ik i should probably do json marshaling here but lazy
+	body := strings.NewReader("{\"type\":\"" + action + "\",\"amount\":" + strconv.FormatFloat(amount, 'g', -1, 64) + "}") //ik i should probably do json marshaling here but lazy
 	req, err := http.NewRequest("GET", "https://rugplay.com/api/coin/"+coin+"/trade", body)
 	req.AddCookie(&http.Cookie{
-		Name: "__Secure-better-auth.session_token",
+		Name:  "__Secure-better-auth.session_token",
 		Value: token,
 	})
 	if err != nil {
 		return err
 	}
-	
+
 	resp, reqerr := http.DefaultClient.Do(req)
 	if reqerr != nil {
 		return reqerr
@@ -51,8 +52,9 @@ func main() {
 	loadAccounts()
 	fmt.Println("done!")
 	fmt.Print("filling accounts... 🤑🤑🤑 ")
-	fillAccounts()
+	earned := fillAccounts()
 	go startFillingAccounts()
-	fmt.Println("done!")
+	fmt.Println("done! (earned " + strconv.FormatFloat(earned, 'g', -1, 64) + " across all accounts)")
 	
+
 }
